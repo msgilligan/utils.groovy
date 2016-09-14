@@ -6,7 +6,7 @@ allprojects {
     apply plugin: 'groovy'
 
     version = '0.1-SNAPSHOT'
-    group = 'com.msgilligan.groovy-utils'
+    group = 'com.msgilligan.utilsgroovy'
 
     repositories {
         jcenter()
