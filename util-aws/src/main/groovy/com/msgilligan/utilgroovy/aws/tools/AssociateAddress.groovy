@@ -23,9 +23,7 @@ class AssociateAddress {
 
         println "Creating EC2 client..."
 
-        def regionName = System.getenv("AWS_DEFAULT_REGION")
-        def region = Regions.fromName(regionName)
-        def ec2 = new GroovyEC2Client().setRegion(region)
+        def ec2 = new GroovyEC2Client()
 
         println "Associating ${machineName} with ${address}..."
 
