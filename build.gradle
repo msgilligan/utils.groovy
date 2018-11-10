@@ -1,4 +1,4 @@
-ext.groovyVersion = '2.4.7'
+ext.groovyVersion = '2.4.13'
 ext.slf4jVersion = '1.7.21'
 
 allprojects {
@@ -18,7 +18,7 @@ subprojects {
         compile "org.codehaus.groovy:groovy:${groovyVersion}"
         compile "org.slf4j:slf4j-api:${slf4jVersion}"
 
-        testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2") {
+        testCompile("org.spockframework:spock-core:1.1-groovy-2.4") {
             exclude module: "groovy-all"
         }
 
