@@ -18,7 +18,7 @@ class AssociateAddress {
 
         println "Getting EC2 instance ID for ${machineName} from Vagrant..."
 
-        def instanceId = new VagrantBox(machineName).getEC2InstanceId()
+        String instanceId = new VagrantBox(machineName).getEC2InstanceId()
 
         println "Creating EC2 client..."
 

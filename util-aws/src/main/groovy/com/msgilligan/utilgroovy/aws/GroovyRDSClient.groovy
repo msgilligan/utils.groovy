@@ -6,12 +6,18 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.rds.AmazonRDS
 import com.amazonaws.services.rds.AmazonRDSClientBuilder
 import com.amazonaws.services.rds.model.CreateDBInstanceRequest
+import com.amazonaws.services.rds.model.CreateDBSnapshotRequest
 import com.amazonaws.services.rds.model.DBInstance
+import com.amazonaws.services.rds.model.DBSnapshot
 import com.amazonaws.services.rds.model.DeleteDBInstanceRequest
+import com.amazonaws.services.rds.model.DescribeDBSnapshotsRequest
+import com.amazonaws.services.rds.model.RestoreDBInstanceFromDBSnapshotRequest
+import groovy.transform.CompileStatic
 
 /**
  * Wrapper for AmazonRDSClient
  */
+@CompileStatic
 class GroovyRDSClient {
     private AmazonRDS rds
 
@@ -32,7 +38,7 @@ class GroovyRDSClient {
                 .build()
     }
 
-    public DBInstance createDBInstance(String instanceID, String securityGID, String username, String password, Boolean publicIP) {
+    DBInstance createDBInstance(String instanceID, String securityGID, String username, String password, Boolean publicIP) {
         def req = new CreateDBInstanceRequest()
                 .withDBInstanceIdentifier(instanceID)
                 .withEngine("postgres")
@@ -58,7 +64,7 @@ class GroovyRDSClient {
         return result
     }
 
-    public List<DBInstance> listDBInstances() {
+    List<DBInstance> listDBInstances() {
         def result = rds.describeDBInstances()
 
         def list = result.getDBInstances()
@@ -69,6 +75,41 @@ class GroovyRDSClient {
         }
         
         return list
+    }
+
+    List<DBSnapshot> listDBSnapshots(String dbInstanceIdentifier = null) {
+        def req = new DescribeDBSnapshotsRequest()
+
+        if (dbInstanceIdentifier) {
+            req.DBInstanceIdentifier = dbInstanceIdentifier
+        }
+
+        def result = rds.describeDBSnapshots(req)
+
+        def list = result.getDBSnapshots()
+
+        list.each {
+            println "${it.DBSnapshotIdentifier}: ${it.DBInstanceIdentifier} at ${it.snapshotCreateTime}"
+            println ""
+        }
+
+        return list
+    }
+
+    DBSnapshot createSnapshot(String dbInstanceIdentifier, String dbSnapshotIdentifier = null) {
+        def req = new CreateDBSnapshotRequest()
+            .withDBInstanceIdentifier(dbInstanceIdentifier)
+        if (dbSnapshotIdentifier) {
+            req.setDBSnapshotIdentifier(dbSnapshotIdentifier)
+        }
+        rds.createDBSnapshot(req)
+    }
+
+    DBInstance newInstanceFromSnapshot(String snapshotID, String newInstanceID) {
+        def req = new RestoreDBInstanceFromDBSnapshotRequest()
+            .withDBSnapshotIdentifier(snapshotID)
+            .withDBInstanceIdentifier(newInstanceID)
+        return rds.restoreDBInstanceFromDBSnapshot(req)
     }
 
 }

@@ -6,10 +6,13 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.ec2.AmazonEC2
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder
 import com.amazonaws.services.ec2.model.AssociateAddressRequest
+import com.amazonaws.services.ec2.model.Region
+import groovy.transform.CompileStatic
 
 /**
  * Simple Groovy wrapper for AmazonEC2Client
  */
+@CompileStatic
 class GroovyEC2Client {
     AmazonEC2 ec2
 
@@ -43,13 +46,13 @@ class GroovyEC2Client {
      * @param address Pre-allocated Elastic IP address
      * @return
      */
-    def associateAddress(instanceId, address) {
+    def associateAddress(String instanceId, String address) {
         def req = new AssociateAddressRequest(instanceId, address)
         def result = ec2.associateAddress(req)
         return result
     }
 
-    List<com.amazonaws.services.ec2.model.Region> listRegions() {
+    List<Region> listRegions() {
         def result = ec2.describeRegions()
         result.regions.each { region ->
             println "${region.regionName}"

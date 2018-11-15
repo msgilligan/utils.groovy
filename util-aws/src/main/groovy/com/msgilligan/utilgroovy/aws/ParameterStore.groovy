@@ -9,10 +9,12 @@ import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement
 import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagementClientBuilder
 import com.amazonaws.services.simplesystemsmanagement.model.GetParameterRequest
 import com.amazonaws.services.simplesystemsmanagement.model.GetParameterResult
+import groovy.transform.CompileStatic
 
 /**
  * Wrapper for AWSSimpleSystemsManagement
  */
+@CompileStatic
 class ParameterStore {
     private AWSSimpleSystemsManagement client
     private AWSCredentialsProvider credentialsProvider

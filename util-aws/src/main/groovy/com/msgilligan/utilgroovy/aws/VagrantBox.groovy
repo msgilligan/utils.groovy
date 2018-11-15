@@ -12,10 +12,10 @@ class VagrantBox {
         this.machineName = machineName;
     }
 
-    def getEC2InstanceId() {
+    String getEC2InstanceId() {
         def json = "vagrant awsinfo -p -m ${machineName}".execute().text
         def info = new JsonSlurper().parseText(json)
-        def instanceId = info.instance_id
+        String instanceId = info.instance_id
         return instanceId
     }
 }
