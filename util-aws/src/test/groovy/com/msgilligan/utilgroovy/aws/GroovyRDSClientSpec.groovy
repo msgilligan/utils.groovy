@@ -1,23 +1,18 @@
 package com.msgilligan.utilgroovy.aws
 
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.BasicAWSCredentials
+import spock.lang.Ignore
 import spock.lang.Shared
-import spock.lang.Specification
 
 /**
  *
  */
-class GroovyRDSClientSpec extends Specification {
+class GroovyRDSClientSpec extends BaseAWSClientSpec {
 
     @Shared
     GroovyRDSClient rds
 
     def setup() {
-//        String accessKey = System.getenv("AWS_ACCESS_KEY");
-//        String secretKey = System.getenv("AWS_SECRET_KEY");
-//        AWSCredentials cred = new BasicAWSCredentials(accessKey, secretKey);
-        rds = new GroovyRDSClient()
+        rds = new GroovyRDSClient(credentialsProvider, regionEnum)
         assert rds != null
     }
 
@@ -28,6 +23,25 @@ class GroovyRDSClientSpec extends Specification {
         then:
         list != null
         list.size() >= 0
+    }
+
+    @Ignore("Takes too long")
+    def "can create and delete instance"() {
+        def instanceID = 'deleteme'
+        def username = "unittestuser"
+        def password = "deletemepleasehurryupdeletemenow"
+
+        when: "we create an instance"
+        def instance = rds.createDBInstance(instanceID, null, username, password, true)
+
+        then: "instance is valid"
+        instance.engine == "PostgreSQL"
+
+        when: "we delete it"
+        instance = rds.deleteDBInstance(instanceID)
+
+        then:
+        instance.getDBInstanceStatus() == "goingaway"
     }
 
 }

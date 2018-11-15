@@ -17,18 +17,20 @@ class ParameterStore {
     private AWSSimpleSystemsManagement client
     private AWSCredentialsProvider credentialsProvider
 
-    public ParameterStore() {
+    ParameterStore() {
         this(new EnvironmentVariableCredentialsProvider())
     }
 
-    public ParameterStore(AWSCredentialsProvider provider) {
+    ParameterStore(AWSCredentialsProvider provider) {
+        this(provider, Regions.DEFAULT_REGION)
+    }
+
+    ParameterStore(AWSCredentialsProvider provider, Regions regionEnum) {
         credentialsProvider = provider
-        def regionName = System.getenv("AWS_DEFAULT_REGION")
-        Regions regions = Regions.fromName(regionName)
         client = AWSSimpleSystemsManagementClientBuilder
                 .standard()
                 .withCredentials(credentialsProvider)
-                .withRegion(regions)
+                .withRegion(regionEnum)
                 .build()
     }
 

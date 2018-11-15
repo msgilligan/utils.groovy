@@ -1,9 +1,10 @@
 package com.msgilligan.utilgroovy.aws
 
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
-import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.rds.AmazonRDSClient
+import com.amazonaws.services.rds.AmazonRDS
+import com.amazonaws.services.rds.AmazonRDSClientBuilder
 import com.amazonaws.services.rds.model.CreateDBInstanceRequest
 import com.amazonaws.services.rds.model.DBInstance
 import com.amazonaws.services.rds.model.DeleteDBInstanceRequest
@@ -12,13 +13,23 @@ import com.amazonaws.services.rds.model.DeleteDBInstanceRequest
  * Wrapper for AmazonRDSClient
  */
 class GroovyRDSClient {
-    private AmazonRDSClient rds
+    private AmazonRDS rds
 
-    public GroovyRDSClient() {
-        def credentials = new EnvironmentVariableCredentialsProvider().getCredentials()
+    GroovyRDSClient() {
+        this(new EnvironmentVariableCredentialsProvider())
+    }
+
+    GroovyRDSClient(AWSCredentialsProvider credentialsProvider) {
+        this(credentialsProvider, Regions.DEFAULT_REGION)
+    }
+
+    GroovyRDSClient(AWSCredentialsProvider credentialsProvider, Regions regionEnum) {
         println "Creating RDS client..."
-        rds = new AmazonRDSClient(credentials)
-        rds.region = Region.getRegion(Regions.US_WEST_2)
+        rds = AmazonRDSClientBuilder
+                .standard()
+                .withCredentials(credentialsProvider)
+                .withRegion(regionEnum)
+                .build()
     }
 
     public DBInstance createDBInstance(String instanceID, String securityGID, String username, String password, Boolean publicIP) {

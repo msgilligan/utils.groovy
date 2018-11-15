@@ -1,23 +1,17 @@
 package com.msgilligan.utilgroovy.aws
 
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.BasicAWSCredentials
 import spock.lang.Shared
-import spock.lang.Specification
 
 /**
  *
  */
-class GroovyEC2ClientSpec extends Specification {
+class GroovyEC2ClientSpec extends BaseAWSClientSpec {
 
     @Shared
     GroovyEC2Client ec2
 
     def setup() {
-        String accessKey = System.getenv("AWS_ACCESS_KEY");
-        String secretKey = System.getenv("AWS_SECRET_KEY");
-        AWSCredentials cred = new BasicAWSCredentials(accessKey, secretKey);
-        ec2 = new GroovyEC2Client(cred)
+        ec2 = new GroovyEC2Client(credentialsProvider, regionEnum)
         assert ec2 != null
     }
     

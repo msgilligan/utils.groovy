@@ -1,6 +1,5 @@
 package com.msgilligan.utilgroovy.aws.tools
 
-import com.amazonaws.regions.Regions
 import com.msgilligan.utilgroovy.aws.GroovyEC2Client
 import com.msgilligan.utilgroovy.aws.VagrantBox
 

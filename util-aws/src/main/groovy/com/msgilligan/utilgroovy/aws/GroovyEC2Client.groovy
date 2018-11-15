@@ -1,43 +1,40 @@
 package com.msgilligan.utilgroovy.aws
 
-import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.ec2.AmazonEC2Client
-import com.amazonaws.regions.Region
+import com.amazonaws.services.ec2.AmazonEC2
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder
 import com.amazonaws.services.ec2.model.AssociateAddressRequest
 
 /**
  * Simple Groovy wrapper for AmazonEC2Client
  */
 class GroovyEC2Client {
-    AWSCredentials credentials
-    AmazonEC2Client ec2
+    AmazonEC2 ec2
 
     /**
      * Default constructor uses environment variable credentials
      */
     GroovyEC2Client() {
-        this(new EnvironmentVariableCredentialsProvider().getCredentials())
+        this(new EnvironmentVariableCredentialsProvider())
     }
 
     /**
      * Construct with any instance of AWSCredentials
      */
-    GroovyEC2Client(AWSCredentials credentials) {
-        ec2 = new AmazonEC2Client(credentials)
-        def regionName = System.getenv("AWS_DEFAULT_REGION")
-        if (regionName) {
-            def region = Regions.fromName(regionName)
-            setRegion(region)
-        }
+    GroovyEC2Client(AWSCredentialsProvider credentialsProvider) {
+        this(credentialsProvider, Regions.DEFAULT_REGION)
     }
 
-    GroovyEC2Client setRegion(Regions region) {
-        ec2.region = Region.getRegion(region)
-        return this
+    GroovyEC2Client(AWSCredentialsProvider credentialsProvider, Regions regionEnum) {
+        ec2 = AmazonEC2ClientBuilder
+                .standard()
+                .withCredentials(credentialsProvider)
+                .withRegion(regionEnum)
+                .build()
     }
-
+    
     /**
      * Associate an Elastic IP address with an Amazon instance
      * Roughly equivalent to:
