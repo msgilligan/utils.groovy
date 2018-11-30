@@ -1,0 +1,56 @@
+allprojects {
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
+    task sourceJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourceJar
+        archives javadocJar
+    }
+
+    publishing {
+        publications {
+            jar(MavenPublication) {
+                from components.java
+
+//                artifact sourceJar {
+//                    classifier "sources"
+//                }
+            }
+
+        }
+    }
+
+    bintray {
+        user = project.hasProperty("binTrayAPIUser") ? binTrayAPIUser : 'please set binTrayAPIUser'
+        key = project.hasProperty("binTrayAPIKey") ? binTrayAPIKey : 'please set binTrayAPIKey'
+        dryRun = false // whether to run this as dry-run, without deploying
+        publications = ['jar'] // When uploading Maven-based publication files
+        pkg {
+            repo = 'maven'
+            name = 'com.msgilligan.utilsgroovy'
+            desc = 'Groovy utility library'
+            websiteUrl = 'https://github.com/msgilligan/utils.groovy'
+            issueTrackerUrl = 'https://github.com/msgilligan/utils.groovy/issues'
+            vcsUrl = 'https://github.com/msgilligan/utils.groovy.git'
+            licenses = ['Apache-2.0']
+            labels = ['aws-sdk', 'rds']
+            version {
+                name = groovyUtilsVersion
+                desc = 'Preliminary release.'
+                released  = new Date()
+                vcsTag = 'none'
+            }
+        }
+    }
+}
