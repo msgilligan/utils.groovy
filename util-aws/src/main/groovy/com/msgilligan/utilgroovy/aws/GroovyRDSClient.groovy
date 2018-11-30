@@ -32,7 +32,6 @@ class GroovyRDSClient {
     }
 
     GroovyRDSClient(AWSCredentialsProvider credentialsProvider, Regions regionEnum) {
-        println "Creating RDS client..."
         rds = AmazonRDSClientBuilder
                 .standard()
                 .withCredentials(credentialsProvider)
@@ -54,7 +53,6 @@ class GroovyRDSClient {
                 .withMasterUserPassword(password)
 
         def instance = rds.createDBInstance(req)
-        println instance
         return instance
     }
 
@@ -62,21 +60,12 @@ class GroovyRDSClient {
         DeleteDBInstanceRequest req = new DeleteDBInstanceRequest(instanceID)
                 .withSkipFinalSnapshot(true)
         def result = rds.deleteDBInstance(req)
-        println result
         return result
     }
 
     List<DBInstance> listDBInstances() {
         def result = rds.describeDBInstances()
-
-        def list = result.getDBInstances()
-
-        list.each {
-            println "${it.getDBInstanceIdentifier()}: ${it.getDBInstanceStatus()}"
-            println ""
-        }
-        
-        return list
+        return result.getDBInstances()
     }
 
     DBInstance describeDBInstance(String dbInstanceID) {
@@ -98,12 +87,6 @@ class GroovyRDSClient {
         def result = rds.describeDBSnapshots(req)
 
         def list = result.getDBSnapshots()
-
-        list.each {
-            println "${it.DBSnapshotIdentifier}: ${it.DBInstanceIdentifier} at ${it.snapshotCreateTime}"
-            println ""
-        }
-
         return list
     }
 
@@ -142,7 +125,6 @@ class GroovyRDSClient {
     boolean copySecurityGroup(String sourceId, String destID) {
         DBInstance source = this.describeDBInstance(sourceId)
         String vpcSecurityGroupId = source.vpcSecurityGroups[0].vpcSecurityGroupId
-        println "Secgroup = $vpcSecurityGroupId"
         this.addSecurityGroup(destID, vpcSecurityGroupId)
         return true
     }
