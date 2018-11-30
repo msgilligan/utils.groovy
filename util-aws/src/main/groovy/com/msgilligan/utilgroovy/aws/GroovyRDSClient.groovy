@@ -10,7 +10,9 @@ import com.amazonaws.services.rds.model.CreateDBSnapshotRequest
 import com.amazonaws.services.rds.model.DBInstance
 import com.amazonaws.services.rds.model.DBSnapshot
 import com.amazonaws.services.rds.model.DeleteDBInstanceRequest
+import com.amazonaws.services.rds.model.DescribeDBInstancesRequest
 import com.amazonaws.services.rds.model.DescribeDBSnapshotsRequest
+import com.amazonaws.services.rds.model.ModifyDBInstanceRequest
 import com.amazonaws.services.rds.model.RestoreDBInstanceFromDBSnapshotRequest
 import groovy.transform.CompileStatic
 
@@ -77,6 +79,15 @@ class GroovyRDSClient {
         return list
     }
 
+    DBInstance describeDBInstance(String dbInstanceID) {
+        def req = new DescribeDBInstancesRequest()
+            .withDBInstanceIdentifier(dbInstanceID)
+        def result = rds.describeDBInstances(req)
+
+        DBInstance instance = result.getDBInstances()[0]
+        return instance
+    }
+
     List<DBSnapshot> listDBSnapshots(String dbInstanceIdentifier = null) {
         def req = new DescribeDBSnapshotsRequest()
 
@@ -111,5 +122,36 @@ class GroovyRDSClient {
             .withDBInstanceIdentifier(newInstanceID)
         return rds.restoreDBInstanceFromDBSnapshot(req)
     }
+
+    boolean addSecurityGroup(String instanceID, String securityGroupName) {
+        ModifyDBInstanceRequest req = new ModifyDBInstanceRequest()
+            .withDBInstanceIdentifier(instanceID)
+            .withVpcSecurityGroupIds(securityGroupName)
+            .withApplyImmediately(true)
+        rds.modifyDBInstance(req)
+    }
+
+    /**
+     * Copy the (first) VPC Security group from one DB instance to another
+     * This is needed after newInstanceFromSnapshot to enable access
+     * 
+     * @param sourceId Id of source DB instance
+     * @param destID Id of destination DB instance
+     * @return
+     */
+    boolean copySecurityGroup(String sourceId, String destID) {
+        DBInstance source = this.describeDBInstance(sourceId)
+        String vpcSecurityGroupId = source.vpcSecurityGroups[0].vpcSecurityGroupId
+        println "Secgroup = $vpcSecurityGroupId"
+        this.addSecurityGroup(destID, vpcSecurityGroupId)
+        return true
+    }
+
+    String pgURLForIdentifier(String dbInstanceIdentifier) {
+        DBInstance instance = this.describeDBInstance(dbInstanceIdentifier)
+        return "postgresql://${instance.masterUsername}@${instance.endpoint.address}:${instance.endpoint.port}/${instance.DBName}"
+    }
+
+    /* TODO: pgDumpInstance */
 
 }
